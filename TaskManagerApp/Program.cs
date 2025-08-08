@@ -1,9 +1,28 @@
 ﻿using TaskManagerApp;
+using System.Text.Json;
+using System.Xml;
 
 List<TaskItem> tasks = new List<TaskItem>();
+string filePath = "tasks.json";
 
 bool exit = false;
 
+
+void LoadTasks()
+{
+    if (File.Exists(filePath))
+    {
+        string json = File.ReadAllText(filePath);
+        tasks = JsonSerializer.Deserialize<List<TaskItem>>(json) ?? new List<TaskItem>();
+    }
+}
+void SaveTasks()
+{
+    string json = JsonSerializer.Serialize(tasks, new JsonSerializerOptions { WriteIndented = true});
+    File.WriteAllText(filePath, json);
+}
+
+LoadTasks();
 
 while (!exit)
 {
@@ -61,6 +80,7 @@ void AddTask()
     };
 
     tasks.Add(task);
+    SaveTasks();
     Console.WriteLine("Task Added!");
 }
 void ListTasks()
@@ -88,6 +108,7 @@ void MarkTaskAsDone()
     if(int.TryParse(Console.ReadLine(),out int index) && index > 0 && index <= tasks.Count){
 
         tasks[index - 1].IsCompleted = true;
+        SaveTasks();
         Console.WriteLine("Task marked as completed");
     }
     else
@@ -109,6 +130,7 @@ void DeleteTask()
     if (int.TryParse(Console.ReadLine(), out int index) && index > 0 && index <= tasks.Count)
     {
         tasks.RemoveAt(index - 1);
+        SaveTasks();
         Console.WriteLine("Task deleted!");
     }
     else
