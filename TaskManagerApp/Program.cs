@@ -29,9 +29,10 @@ while (!exit)
     Console.WriteLine("\n=== Task Manager ===");
     Console.WriteLine("1. Add task");
     Console.WriteLine("2. List tasks");
-    Console.WriteLine("3. Mark task as done");
-    Console.WriteLine("4. Delete task");
-    Console.WriteLine("5. Exit");
+    Console.WriteLine("3. List incomplete tasks");
+    Console.WriteLine("4. Mark task as done");
+    Console.WriteLine("5. Delete task");
+    Console.WriteLine("6. Exit");
     Console.WriteLine("Choose an option: ");
 
     string choice = Console.ReadLine();
@@ -45,12 +46,15 @@ while (!exit)
             ListTasks();
             break;
         case "3":
-            MarkTaskAsDone();
+            ListTasks(onlyIncomplete: true);
             break;
         case "4":
-            DeleteTask();
+            MarkTaskAsDone();
             break;
         case "5":
+            DeleteTask();
+            break;
+        case "6":
             exit = true;
             Console.WriteLine("Bye Bye");
             break;
@@ -83,17 +87,33 @@ void AddTask()
     SaveTasks();
     Console.WriteLine("Task Added!");
 }
-void ListTasks()
+void ListTasks(bool onlyIncomplete = false)
 {
+    var tasksToShow = tasks
+        .Where(t => !onlyIncomplete || !t.IsCompleted)
+        .OrderBy(t => t.DueDate)
+        .ToList();
+
     if (tasks.Count == 0)
     {
         Console.WriteLine("No tasks yet.");
         return;
     }
     Console.WriteLine("\n--- Your Tasks ---");
-    for (int i = 0; i < tasks.Count; i++)
+    for (int i = 0; i < tasksToShow.Count; i++)
     {
+        var task = tasksToShow[i];
+
+        Console.ForegroundColor = task.Priority switch
+        {
+            Priority.High => ConsoleColor.Red,
+            Priority.Medium => ConsoleColor.Yellow,
+            Priority.Low => ConsoleColor.Green,
+            _ => ConsoleColor.White
+        };
+
         Console.WriteLine($"{i + 1}.{tasks[i]}");
+        Console.ResetColor();
     }
 }
 void MarkTaskAsDone()
