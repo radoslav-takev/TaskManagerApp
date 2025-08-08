@@ -18,7 +18,7 @@ namespace TaskManagerApp
 
         public override string ToString()
         {
-            return $"{Title}";
+            return $"{Title} | Due: {DueDate:yyyy-MM-dd} | Priority: {Priority} | Completed: {IsCompleted}";
         }
 
     }
